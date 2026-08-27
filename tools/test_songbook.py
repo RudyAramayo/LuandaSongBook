@@ -35,14 +35,23 @@ class SongbookLoaderTests(unittest.TestCase):
     def test_unavailable_legacy_domain_is_not_published(self) -> None:
         published_domains = {url_domain(url) for entry in self.entries for url in entry.urls}
         self.assertNotIn("capoeira-music.net", published_domains)
-        self.assertEqual(published_domains, {"youtu.be"})
+        self.assertEqual(published_domains, {"music.apple.com", "youtu.be"})
+
+    def test_acaraje_song_and_listening_link_are_loaded(self) -> None:
+        entry = next(item for item in self.entries if item.source_path.name == "Acarajé")
+        self.assertEqual(entry.title, "Solta todo aquele axé que tá dentro de você")
+        self.assertIn("Acarajé é igual roda", entry.lines)
+        self.assertEqual(
+            entry.urls,
+            ["https://music.apple.com/us/album/acaraj%C3%A9/1761503257?i=1761503258"],
+        )
 
     def test_expected_unique_entry_counts(self) -> None:
         counts = {
             category: sum(entry.category == category for entry in self.entries)
             for category in ("Songs", "Quadras de Bimba", "Rhythms")
         }
-        self.assertEqual(counts, {"Songs": 36, "Quadras de Bimba": 7, "Rhythms": 8})
+        self.assertEqual(counts, {"Songs": 37, "Quadras de Bimba": 7, "Rhythms": 8})
 
 
 if __name__ == "__main__":
